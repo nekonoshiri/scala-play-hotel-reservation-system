@@ -10,6 +10,7 @@ scalaVersion := "3.6.4"
 libraryDependencies ++= Seq(
   guice,
   jdbc,
+  jdbc % Test,
   "com.h2database" % "h2" % "2.3.232",
   "org.playframework.anorm" %% "anorm" % "2.8.1",
   "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.1" % Test

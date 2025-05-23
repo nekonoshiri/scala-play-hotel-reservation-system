@@ -23,19 +23,6 @@ class BedTypeRepositorySpec extends PlaySpec with GuiceOneAppPerTest with ScalaF
       val repository = app.injector.instanceOf[BedTypeRepository]
       val db = app.injector.instanceOf[Database]
 
-      // TODO: Evolutions を使ってマイグレーションを行うように変更する予定。
-      // とりあえず暫定処理としてここでテーブルを作成している
-      // See: https://www.playframework.com/documentation/3.0.x/ScalaTestingWithDatabases#Applying-evolutions
-      db.withConnection { implicit connection =>
-        SQL("""
-          CREATE TABLE bed_types (
-            id IDENTITY,
-            name TEXT NOT NULL,
-            description TEXT NOT NULL
-          )
-        """).execute()
-      }
-
       val testCases = Table(
         ("name", "description"),
         ("名前A", "説明A"),

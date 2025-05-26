@@ -1,6 +1,7 @@
 package models
 
 import anorm.{Macro, SQL}
+import java.sql.Connection
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatestplus.play.PlaySpec
@@ -36,7 +37,8 @@ class BedTypeRepositorySpec extends PlaySpec with GuiceOneAppPerTest with ScalaF
         whenReady(repository.insert(bedType)) { returned =>
           returned.id must not be 0
 
-          db.withConnection { implicit connection =>
+          db.withConnection { connection =>
+            given Connection = connection
             val parser = Macro.parser[IdentifiedBedType]("id", "name", "description")
             val inserted = SQL("SELECT * FROM bed_types WHERE id = {id}").on("id" -> returned.id).as(parser.single)
             inserted mustBe returned

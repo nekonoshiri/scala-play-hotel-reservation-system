@@ -1,6 +1,7 @@
 package models
 
 import anorm.SQL
+import java.sql.Connection
 import javax.inject.Inject
 import play.api.db.Database
 import scala.concurrent.Future
@@ -21,7 +22,8 @@ class BedTypeRepository @Inject() (db: Database) (
     */
   def insert(bedType: InitialBedType): Future[IdentifiedBedType] =
     Future {
-      db.withConnection { implicit connection =>
+      db.withConnection { connection =>
+        given Connection = connection
         val sql = SQL(
           """
           INSERT INTO bed_types (name, description)

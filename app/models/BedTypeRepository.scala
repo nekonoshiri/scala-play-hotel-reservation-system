@@ -1,6 +1,6 @@
 package models
 
-import anorm.SQL
+import anorm.{Macro, SQL}
 import java.sql.Connection
 import javax.inject.Inject
 import play.api.db.Database
@@ -14,6 +14,23 @@ class BedTypeRepository @Inject() (db: Database) (
   // Future { ... } 内で DatabaseExecutionContext を実行コンテキストとして利用する
   using DatabaseExecutionContext
 ):
+  /**
+    * ベッドタイプの一覧を取得します。
+    *
+    * @return ベッドタイプの一覧。
+    */
+  def list(): Future[List[IdentifiedBedType]] =
+    Future {
+      db.withConnection { connection =>
+        given Connection = connection
+        val parser = Macro.parser[IdentifiedBedType]("id", "name", "description")
+        SQL("SELECT * FROM bed_types").as(parser.*)
+      }
+    }.recoverWith {
+      case NonFatal(e) =>
+        Future.failed(new RuntimeException(s"ベッドタイプの一覧取得に失敗しました: ${e.getMessage}", e))
+    }
+
   /**
     * ベッドタイプを挿入します。挿入時に ID が振られます。ID が振られたベッドタイプを返します。
     *

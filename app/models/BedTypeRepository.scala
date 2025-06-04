@@ -11,7 +11,7 @@ import scala.util.control.NonFatal
   * ベッドタイプのリポジトリ。
   */
 class BedTypeRepository @Inject() (db: Database) (
-  // Future { ... } 内で DatabaseExecutionContext を実行コンテキストとして利用する
+  // 非同期処理の実行コンテキストとして DatabaseExecutionContext を利用する
   using DatabaseExecutionContext
 ):
   /**

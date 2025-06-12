@@ -1,5 +1,10 @@
 {
   "files.watcherExclude": {
     "**/target": true
-  }
+  },
+  "[scala][sbt][sc]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "scalameta.metals"
+  },
+  "metals.scalafmtConfigPath": ".scalafmt.conf"
 }

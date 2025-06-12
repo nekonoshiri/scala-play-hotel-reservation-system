@@ -3,7 +3,7 @@ package models
 import anorm.{BatchSql, Macro, NamedParameter, SQL}
 import java.sql.Connection
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatest.prop.TableDrivenPropertyChecks.*
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.Application
@@ -11,7 +11,10 @@ import play.api.db.Database
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.inMemoryDatabase
 
-class BedTypeRepositorySpec extends PlaySpec with GuiceOneAppPerTest with ScalaFutures:
+class BedTypeRepositorySpec
+    extends PlaySpec
+    with GuiceOneAppPerTest
+    with ScalaFutures:
 
   // test_db という名前のインメモリデータベースを使用してテストする
   override def fakeApplication(): Application =
@@ -19,12 +22,11 @@ class BedTypeRepositorySpec extends PlaySpec with GuiceOneAppPerTest with ScalaF
       .configure(inMemoryDatabase("test_db"))
       .build()
 
-  /**
-   * データベースをリセットします。
-   *
-   * [[GuiceOneAppPerTest]] を用いる場合、テスト毎にデータベースはリセットされます。それ以外のタイミング、例えば
-   * `forAll` 内でのテストケース毎にデータベースをリセットしたい場合等に利用できます。
-   */
+  /** データベースをリセットします。
+    *
+    * [[GuiceOneAppPerTest]] を用いる場合、テスト毎にデータベースはリセットされます。それ以外のタイミング、例えば `forAll`
+    * 内でのテストケース毎にデータベースをリセットしたい場合等に利用できます。
+    */
   private def resetDatabase(): Unit =
     val db = app.injector.instanceOf[Database]
     db.withConnection { connection =>
@@ -38,14 +40,14 @@ class BedTypeRepositorySpec extends PlaySpec with GuiceOneAppPerTest with ScalaF
       val db = app.injector.instanceOf[Database]
 
       val testCases = Table(
-        ("bedTypes"),
+        "bedTypes",
         List.empty,
         List(IdentifiedBedType(1, "名前A", "説明A")),
         List(
           IdentifiedBedType(1, "名前A", "説明A"),
           IdentifiedBedType(2, "名前B", "説明B"),
-          IdentifiedBedType(3, "名前C", "説明C"),
-        ),
+          IdentifiedBedType(3, "名前C", "説明C")
+        )
       )
 
       forAll(testCases) { bedTypes =>
@@ -53,19 +55,22 @@ class BedTypeRepositorySpec extends PlaySpec with GuiceOneAppPerTest with ScalaF
 
         db.withConnection { connection =>
           given Connection = connection
-          bedTypes.map(bt => Seq[NamedParameter](
-            "id" -> bt.id,
-            "name" -> bt.name,
-            "description" -> bt.description,
-          )) match
-            case Nil => ()
+          bedTypes.map(bt =>
+            Seq[NamedParameter](
+              "id" -> bt.id,
+              "name" -> bt.name,
+              "description" -> bt.description
+            )
+          ) match
+            case Nil          => ()
             case head :: tail =>
               BatchSql(
                 """
                 INSERT INTO bed_types (id, name, description)
                 VALUES ({id}, {name}, {description})
                 """,
-                head, tail*,
+                head,
+                tail*
               ).execute()
         }
 
@@ -83,7 +88,7 @@ class BedTypeRepositorySpec extends PlaySpec with GuiceOneAppPerTest with ScalaF
         ("name", "description"),
         ("名前A", "説明A"),
         ("名前B", "説明B"),
-        ("", ""),
+        ("", "")
       )
 
       forAll(testCases) { (name, description) =>
@@ -94,8 +99,11 @@ class BedTypeRepositorySpec extends PlaySpec with GuiceOneAppPerTest with ScalaF
 
           db.withConnection { connection =>
             given Connection = connection
-            val parser = Macro.parser[IdentifiedBedType]("id", "name", "description")
-            val inserted = SQL("SELECT * FROM bed_types WHERE id = {id}").on("id" -> returned.id).as(parser.single)
+            val parser =
+              Macro.parser[IdentifiedBedType]("id", "name", "description")
+            val inserted = SQL("SELECT * FROM bed_types WHERE id = {id}")
+              .on("id" -> returned.id)
+              .as(parser.single)
             inserted mustBe returned
           }
         }

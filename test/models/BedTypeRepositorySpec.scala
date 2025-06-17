@@ -10,11 +10,13 @@ import play.api.Application
 import play.api.db.Database
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.inMemoryDatabase
+import play.api.test.Injecting
 
 class BedTypeRepositorySpec
     extends PlaySpec
     with GuiceOneAppPerTest
-    with ScalaFutures:
+    with ScalaFutures
+    with Injecting:
 
   // test_db という名前のインメモリデータベースを使用してテストする
   override def fakeApplication(): Application =
@@ -28,7 +30,7 @@ class BedTypeRepositorySpec
     * 内でのテストケース毎にデータベースをリセットしたい場合等に利用できます。
     */
   private def resetDatabase(): Unit =
-    val db = app.injector.instanceOf[Database]
+    val db = inject[Database]
     db.withConnection { connection =>
       given Connection = connection
       SQL("DELETE FROM bed_types").execute()
@@ -36,8 +38,8 @@ class BedTypeRepositorySpec
 
   "list メソッド" must:
     "ベッドタイプの一覧が取得できること" in:
-      val repository = app.injector.instanceOf[BedTypeRepository]
-      val db = app.injector.instanceOf[Database]
+      val repository = inject[BedTypeRepository]
+      val db = inject[Database]
 
       val testCases = Table(
         "bedTypes",
@@ -81,8 +83,8 @@ class BedTypeRepositorySpec
 
   "insert メソッド" must:
     "ベッドタイプに ID が振られて挿入され、挿入されたベッドタイプが返されること" in:
-      val repository = app.injector.instanceOf[BedTypeRepository]
-      val db = app.injector.instanceOf[Database]
+      val repository = inject[BedTypeRepository]
+      val db = inject[Database]
 
       val testCases = Table(
         ("name", "description"),
